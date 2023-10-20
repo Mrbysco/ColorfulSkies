@@ -64,7 +64,7 @@ public class ClientHandler {
 			float[] sunriseCol = new float[4];
 			float f1 = Mth.cos(timeOfDay * ((float) Math.PI * 2F)) - 0.0F;
 			if (f1 >= -0.4F && f1 <= 0.4F) {
-				float f3 = (f1 - -0.0F) / 0.4F * 0.5F + 0.5F;
+				float f3 = f1 / 0.4F * 0.5F + 0.5F;
 				float f4 = 1.0F - (1.0F - Mth.sin(f3 * (float) Math.PI)) * 0.99F;
 				f4 *= f4;
 				sunriseCol[0] = f3 * 0.3F + sunriseColor.red();
