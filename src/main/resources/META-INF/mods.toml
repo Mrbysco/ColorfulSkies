@@ -1,0 +1,20 @@
+modLoader="javafml"
+loaderVersion="[46,)"
+issueTrackerURL="https://github.com/Mrbysco/ColorfulSkies/issues"
+license="MIT"
+
+[[mods]]
+modId="colorfulskies"
+version="${file.jarVersion}"
+displayName="Colorful Skies"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/colorful-skies"
+authors="Mrbysco"
+description='''
+Wait... The sky isn't supposed to be pink? Well, it is now!
+'''
+[[dependencies.colorfulskies]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20,1.21)"
+ordering="NONE"
+side="BOTH"
