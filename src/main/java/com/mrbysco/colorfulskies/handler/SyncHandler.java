@@ -3,8 +3,8 @@ package com.mrbysco.colorfulskies.handler;
 import com.mrbysco.colorfulskies.world.SkyColorData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class SyncHandler {
 	@SubscribeEvent

@@ -12,15 +12,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 public class SkyColorData extends SavedData {
-	private static final Random random = new Random();
 	private static final String DATA_NAME = ColorfulSkies.MOD_ID + "_world_data";
 
 	private static final Map<UUID, SkyColorInfo> skyColorDataMap = new HashMap<>();
@@ -80,7 +78,7 @@ public class SkyColorData extends SavedData {
 		ServerLevel overworld = level.getServer().getLevel(Level.OVERWORLD);
 
 		DimensionDataStorage storage = overworld.getDataStorage();
-		return storage.computeIfAbsent(com.mrbysco.colorfulskies.world.SkyColorData::load, com.mrbysco.colorfulskies.world.SkyColorData::new, DATA_NAME);
+		return storage.computeIfAbsent(new Factory<>(SkyColorData::new, SkyColorData::load), DATA_NAME);
 	}
 
 	public void setColorForUUID(UUID uuid, SkyColorInfo colorInfo) {
