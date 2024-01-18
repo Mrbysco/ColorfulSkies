@@ -8,11 +8,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mrbysco.colorfulskies.ColorfulSkies;
 import com.mrbysco.colorfulskies.network.PacketHandler;
-import com.mrbysco.colorfulskies.network.message.CloudColorMessage;
-import com.mrbysco.colorfulskies.network.message.DisableSunriseMessage;
-import com.mrbysco.colorfulskies.network.message.MoonColorMessage;
-import com.mrbysco.colorfulskies.network.message.SunColorMessage;
-import com.mrbysco.colorfulskies.network.message.SunriseColorMessage;
+import com.mrbysco.colorfulskies.network.message.CloudColorPayload;
+import com.mrbysco.colorfulskies.network.message.DisableSunrisePayload;
+import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
+import com.mrbysco.colorfulskies.network.message.SunColorPayload;
+import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
 import com.mrbysco.colorfulskies.world.SkyColorData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -64,7 +64,7 @@ public class ModCommands {
 		for (ServerPlayer player : players) {
 			SkyColorData colorData = SkyColorData.get(player.level());
 			colorData.setSunriseDisabledForUUID(player.getUUID(), disabled);
-			PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new DisableSunriseMessage(disabled));
+			player.connection.send(new DisableSunrisePayload(disabled));
 		}
 
 		if (disabled) {
@@ -90,7 +90,7 @@ public class ModCommands {
 			for (ServerPlayer player : players) {
 				SkyColorData colorData = SkyColorData.get(player.level());
 				colorData.setCloudColorForUUID(player.getUUID(), color);
-				PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new CloudColorMessage(color));
+				player.connection.send(new CloudColorPayload(color));
 			}
 
 			if (color == -1) {
@@ -122,7 +122,7 @@ public class ModCommands {
 			for (ServerPlayer player : players) {
 				SkyColorData colorData = SkyColorData.get(player.level());
 				colorData.setSunColorForUUID(player.getUUID(), color);
-				PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new SunColorMessage(color));
+				player.connection.send(new SunColorPayload(color));
 			}
 
 			if (color == -1) {
@@ -154,7 +154,7 @@ public class ModCommands {
 			for (ServerPlayer player : players) {
 				SkyColorData colorData = SkyColorData.get(player.level());
 				colorData.setSunriseColorForUUID(player.getUUID(), color);
-				PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new SunriseColorMessage(color));
+				player.connection.send(new SunriseColorPayload(color));
 			}
 
 			if (color == -1) {
@@ -186,7 +186,7 @@ public class ModCommands {
 			for (ServerPlayer player : players) {
 				SkyColorData colorData = SkyColorData.get(player.level());
 				colorData.setMoonColorForUUID(player.getUUID(), color);
-				PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new MoonColorMessage(color));
+				player.connection.send(new MoonColorPayload(color));
 			}
 
 			if (color == -1) {

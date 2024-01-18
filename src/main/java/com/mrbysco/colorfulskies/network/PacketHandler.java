@@ -1,31 +1,29 @@
 package com.mrbysco.colorfulskies.network;
 
 import com.mrbysco.colorfulskies.ColorfulSkies;
-import com.mrbysco.colorfulskies.network.message.CloudColorMessage;
-import com.mrbysco.colorfulskies.network.message.DisableSunriseMessage;
-import com.mrbysco.colorfulskies.network.message.MoonColorMessage;
-import com.mrbysco.colorfulskies.network.message.SunColorMessage;
-import com.mrbysco.colorfulskies.network.message.SunriseColorMessage;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.NetworkRegistry;
-import net.neoforged.neoforge.network.simple.SimpleChannel;
+import com.mrbysco.colorfulskies.network.handler.ClientPayloadHandler;
+import com.mrbysco.colorfulskies.network.message.CloudColorPayload;
+import com.mrbysco.colorfulskies.network.message.DisableSunrisePayload;
+import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
+import com.mrbysco.colorfulskies.network.message.SunColorPayload;
+import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 
 public class PacketHandler {
-	private static final String PROTOCOL_VERSION = "1";
-	public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-			new ResourceLocation(ColorfulSkies.MOD_ID, "main"),
-			() -> PROTOCOL_VERSION,
-			PROTOCOL_VERSION::equals,
-			PROTOCOL_VERSION::equals
-	);
 
-	private static int id = 0;
+	public static void setupPackets(final RegisterPayloadHandlerEvent event) {
+		final IPayloadRegistrar registrar = event.registrar(ColorfulSkies.MOD_ID);
 
-	public static void init() {
-		CHANNEL.registerMessage(id++, MoonColorMessage.class, MoonColorMessage::encode, MoonColorMessage::decode, MoonColorMessage::handle);
-		CHANNEL.registerMessage(id++, CloudColorMessage.class, CloudColorMessage::encode, CloudColorMessage::decode, CloudColorMessage::handle);
-		CHANNEL.registerMessage(id++, SunColorMessage.class, SunColorMessage::encode, SunColorMessage::decode, SunColorMessage::handle);
-		CHANNEL.registerMessage(id++, SunriseColorMessage.class, SunriseColorMessage::encode, SunriseColorMessage::decode, SunriseColorMessage::handle);
-		CHANNEL.registerMessage(id++, DisableSunriseMessage.class, DisableSunriseMessage::encode, DisableSunriseMessage::decode, DisableSunriseMessage::handle);
+		registrar.play(CloudColorPayload.ID, CloudColorPayload::new, handler -> handler
+				.client(ClientPayloadHandler.getInstance()::handleCloudData));
+		registrar.play(DisableSunrisePayload.ID, DisableSunrisePayload::new, handler -> handler
+				.client(ClientPayloadHandler.getInstance()::handleDisableData));
+		registrar.play(MoonColorPayload.ID, MoonColorPayload::new, handler -> handler
+				.client(ClientPayloadHandler.getInstance()::handleMoonData));
+		registrar.play(SunColorPayload.ID, SunColorPayload::new, handler -> handler
+				.client(ClientPayloadHandler.getInstance()::handleSunData));
+		registrar.play(SunriseColorPayload.ID, SunriseColorPayload::new, handler -> handler
+				.client(ClientPayloadHandler.getInstance()::handleSunriseData));
 	}
 }

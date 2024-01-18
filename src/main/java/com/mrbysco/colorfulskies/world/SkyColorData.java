@@ -1,10 +1,9 @@
 package com.mrbysco.colorfulskies.world;
 
 import com.mrbysco.colorfulskies.ColorfulSkies;
-import com.mrbysco.colorfulskies.network.PacketHandler;
-import com.mrbysco.colorfulskies.network.message.CloudColorMessage;
-import com.mrbysco.colorfulskies.network.message.MoonColorMessage;
-import com.mrbysco.colorfulskies.network.message.SunColorMessage;
+import com.mrbysco.colorfulskies.network.message.CloudColorPayload;
+import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
+import com.mrbysco.colorfulskies.network.message.SunColorPayload;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
@@ -12,7 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -118,9 +116,9 @@ public class SkyColorData extends SavedData {
 
 	public void syncColors(ServerPlayer player) {
 		SkyColorInfo info = this.skyColorDataMap.getOrDefault(player.getUUID(), new SkyColorInfo(-1, -1, -1, -1, false));
-		PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new CloudColorMessage(info.cloud));
-		PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new MoonColorMessage(info.moon));
-		PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new SunColorMessage(info.sun));
+		player.connection.send(new CloudColorPayload(info.cloud));
+		player.connection.send(new MoonColorPayload(info.moon));
+		player.connection.send(new SunColorPayload(info.sun));
 	}
 
 	public record SkyColorInfo(int cloud, int moon, int sun, int sunrise, boolean disableSunrise) {
