@@ -2,11 +2,13 @@ package com.mrbysco.colorfulskies.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrbysco.colorfulskies.client.ClientHandler;
+import com.mrbysco.colorfulskies.client.Color;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,30 +49,6 @@ public class LevelRendererMixin {
 	private void colorfulskies_colorSun(PoseStack poseStack, Matrix4f matrix4f, float partialTick, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci) {
 		if (this.level != null) {
 			ClientHandler.colorTheSun(level, poseStack, matrix4f, partialTick, camera);
-		}
-	}
-
-	@Inject(method = "renderClouds(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FDDD)V", at = @At(
-			value = "INVOKE",
-			target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V",
-			shift = Shift.AFTER,
-			ordinal = 0
-	))
-	private void colorfulskies_colorClouds(PoseStack poseStack, Matrix4f matrix4f, float partialTick, double camX, double camY, double camZ, CallbackInfo ci) {
-		if (this.level != null) {
-			ClientHandler.colorTheCloud(level, poseStack, matrix4f, partialTick, camX, camY, camZ);
-		}
-	}
-
-	@Inject(method = "renderClouds(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FDDD)V", at = @At(
-			value = "INVOKE",
-			target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V",
-			shift = Shift.AFTER,
-			ordinal = 0
-	))
-	private void colorfulskies_resetCloudColor(PoseStack poseStack, Matrix4f matrix4f, float partialTick, double camX, double camY, double camZ, CallbackInfo ci) {
-		if (this.level != null) {
-			ClientHandler.resetCloudColor(level, poseStack, matrix4f, partialTick, camX, camY, camZ);
 		}
 	}
 

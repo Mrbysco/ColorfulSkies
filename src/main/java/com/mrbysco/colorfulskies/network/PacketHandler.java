@@ -4,6 +4,7 @@ import com.mrbysco.colorfulskies.ColorfulSkies;
 import com.mrbysco.colorfulskies.network.message.CloudColorMessage;
 import com.mrbysco.colorfulskies.network.message.DisableSunriseMessage;
 import com.mrbysco.colorfulskies.network.message.MoonColorMessage;
+import com.mrbysco.colorfulskies.network.message.SkyColorMessage;
 import com.mrbysco.colorfulskies.network.message.SunColorMessage;
 import com.mrbysco.colorfulskies.network.message.SunriseColorMessage;
 import net.minecraft.resources.ResourceLocation;
@@ -27,5 +28,6 @@ public class PacketHandler {
 		CHANNEL.registerMessage(id++, SunColorMessage.class, SunColorMessage::encode, SunColorMessage::decode, SunColorMessage::handle);
 		CHANNEL.registerMessage(id++, SunriseColorMessage.class, SunriseColorMessage::encode, SunriseColorMessage::decode, SunriseColorMessage::handle);
 		CHANNEL.registerMessage(id++, DisableSunriseMessage.class, DisableSunriseMessage::encode, DisableSunriseMessage::decode, DisableSunriseMessage::handle);
+		CHANNEL.registerMessage(id++, SkyColorMessage.class, SkyColorMessage::encode, SkyColorMessage::decode, SkyColorMessage::handle);
 	}
 }

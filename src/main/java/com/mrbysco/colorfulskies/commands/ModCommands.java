@@ -11,6 +11,7 @@ import com.mrbysco.colorfulskies.network.PacketHandler;
 import com.mrbysco.colorfulskies.network.message.CloudColorMessage;
 import com.mrbysco.colorfulskies.network.message.DisableSunriseMessage;
 import com.mrbysco.colorfulskies.network.message.MoonColorMessage;
+import com.mrbysco.colorfulskies.network.message.SkyColorMessage;
 import com.mrbysco.colorfulskies.network.message.SunColorMessage;
 import com.mrbysco.colorfulskies.network.message.SunriseColorMessage;
 import com.mrbysco.colorfulskies.world.SkyColorData;
@@ -52,6 +53,10 @@ public class ModCommands {
 										.then(Commands.argument("hex", StringArgumentType.word()).suggests((cs, builder) ->
 														SharedSuggestionProvider.suggest(Collections.singleton("clear"), builder))
 												.executes(ModCommands::setSunriseColor)))
+								.then(Commands.literal("sky")
+										.then(Commands.argument("hex", StringArgumentType.word()).suggests((cs, builder) ->
+														SharedSuggestionProvider.suggest(Collections.singleton("clear"), builder))
+												.executes(ModCommands::setSkyColor)))
 						)
 				)
 		;
@@ -194,6 +199,38 @@ public class ModCommands {
 						.withStyle(ChatFormatting.YELLOW), true);
 			} else {
 				context.getSource().sendSuccess(() -> Component.translatable("colorfulskies.commands.color.moon.success",
+						hex).withStyle(ChatFormatting.YELLOW), true);
+			}
+		} catch (NumberFormatException e) {
+			context.getSource().sendFailure(Component.translatable("colorfulskies.commands.color.invalid_hex"));
+			return 0;
+		}
+
+		return 0;
+	}
+
+	private static int setSkyColor(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+		String value = StringArgumentType.getString(context, "hex");
+		final String hex = value.startsWith("#") ? value : "#" + value;
+		if (!hex.equals("#clear") && !hex.matches("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")) {
+			context.getSource().sendFailure(Component.translatable("colorfulskies.commands.color.invalid_hex"));
+			return 0;
+		}
+		try {
+			int color = hex.equals("#clear") ? -1 : Integer.decode(hex);
+
+			Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "players");
+			for (ServerPlayer player : players) {
+				SkyColorData colorData = SkyColorData.get(player.level());
+				colorData.setSkyColorForUUID(player.getUUID(), color);
+				PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new SkyColorMessage(color));
+			}
+
+			if (color == -1) {
+				context.getSource().sendSuccess(() -> Component.translatable("colorfulskies.commands.color.sky.reset")
+						.withStyle(ChatFormatting.YELLOW), true);
+			} else {
+				context.getSource().sendSuccess(() -> Component.translatable("colorfulskies.commands.color.sky.success",
 						hex).withStyle(ChatFormatting.YELLOW), true);
 			}
 		} catch (NumberFormatException e) {

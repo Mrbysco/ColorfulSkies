@@ -9,5 +9,7 @@
   "colorfulskies.commands.color.sunrise.reset": "Reset sunrise color",
   "colorfulskies.commands.color.invalid_hex": "Invalid Hex",
   "colorfulskies.commands.sunrise.success": "Disabled sunrise visual",
-  "colorfulskies.commands.sunrise.success1": "Enabled sunrise visual"
+  "colorfulskies.commands.sunrise.success1": "Enabled sunrise visual",
+  "colorfulskies.commands.color.sky.success": "Sky color set to %s",
+  "colorfulskies.commands.color.sky.reset": "Reset sky color"
 }
