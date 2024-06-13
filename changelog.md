@@ -1,1 +1,1 @@
-* Allow coloring the Sky itself
+* Initial update to 1.20.6
