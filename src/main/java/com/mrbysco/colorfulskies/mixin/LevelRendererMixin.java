@@ -50,30 +50,6 @@ public class LevelRendererMixin {
 		}
 	}
 
-	@Inject(method = "renderClouds(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FDDD)V", at = @At(
-			value = "INVOKE",
-			target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V",
-			shift = Shift.AFTER,
-			ordinal = 0
-	))
-	private void colorfulskies_colorClouds(PoseStack poseStack, Matrix4f matrix4f, float partialTick, double camX, double camY, double camZ, CallbackInfo ci) {
-		if (this.level != null) {
-			ClientHandler.colorTheCloud(level, poseStack, matrix4f, partialTick, camX, camY, camZ);
-		}
-	}
-
-	@Inject(method = "renderClouds(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FDDD)V", at = @At(
-			value = "INVOKE",
-			target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V",
-			shift = Shift.AFTER,
-			ordinal = 0
-	))
-	private void colorfulskies_resetCloudColor(PoseStack poseStack, Matrix4f matrix4f, float partialTick, double camX, double camY, double camZ, CallbackInfo ci) {
-		if (this.level != null) {
-			ClientHandler.resetCloudColor(level, poseStack, matrix4f, partialTick, camX, camY, camZ);
-		}
-	}
-
 	@ModifyArg(method = "renderSky",
 			slice = @Slice(
 					from = @At(ordinal = 1, value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferUploader;drawWithShader(Lcom/mojang/blaze3d/vertex/BufferBuilder$RenderedBuffer;)V"),

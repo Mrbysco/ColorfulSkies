@@ -5,6 +5,7 @@ import com.mrbysco.colorfulskies.network.handler.ClientPayloadHandler;
 import com.mrbysco.colorfulskies.network.message.CloudColorPayload;
 import com.mrbysco.colorfulskies.network.message.DisableSunrisePayload;
 import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
+import com.mrbysco.colorfulskies.network.message.SkyColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
@@ -25,5 +26,7 @@ public class PacketHandler {
 				.client(ClientPayloadHandler.getInstance()::handleSunData));
 		registrar.play(SunriseColorPayload.ID, SunriseColorPayload::new, handler -> handler
 				.client(ClientPayloadHandler.getInstance()::handleSunriseData));
+		registrar.play(SkyColorPayload.ID, SkyColorPayload::new, handler -> handler
+				.client(ClientPayloadHandler.getInstance()::handleSkyData));
 	}
 }

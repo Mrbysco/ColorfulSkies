@@ -5,6 +5,7 @@ import com.mrbysco.colorfulskies.client.Color;
 import com.mrbysco.colorfulskies.network.message.CloudColorPayload;
 import com.mrbysco.colorfulskies.network.message.DisableSunrisePayload;
 import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
+import com.mrbysco.colorfulskies.network.message.SkyColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
 import net.minecraft.network.chat.Component;
@@ -91,6 +92,25 @@ public class ClientPayloadHandler {
 				.exceptionally(e -> {
 					// Handle exception
 					context.packetHandler().disconnect(Component.translatable("colorfulskies.networking.sunrise_color.failed", e.getMessage()));
+					return null;
+				});
+	}
+
+	public void handleSkyData(final SkyColorPayload data, final PlayPayloadContext context) {
+		context.workHandler().submitAsync(() -> {
+					int color = data.color();
+					if (color == -1) {
+						com.mrbysco.colorfulskies.client.ClientHandler.setSkyColor(null);
+					} else {
+						int r = (color >> 16) & 0xFF;
+						int g = (color >> 8) & 0xFF;
+						int b = (color >> 0) & 0xFF;
+						com.mrbysco.colorfulskies.client.ClientHandler.setSkyColor(new Color((float) r / 255.0F, (float) g / 255.0F, (float) b / 255.0F));
+					}
+				})
+				.exceptionally(e -> {
+					// Handle exception
+					context.packetHandler().disconnect(Component.translatable("colorfulskies.networking.sky_color.failed", e.getMessage()));
 					return null;
 				});
 	}

@@ -10,9 +10,12 @@
   "colorfulskies.commands.color.invalid_hex": "Invalid Hex",
   "colorfulskies.commands.sunrise.success": "Disabled sunrise visual",
   "colorfulskies.commands.sunrise.success1": "Enabled sunrise visual",
+  "colorfulskies.commands.color.sky.success": "Sky color set to %s",
+  "colorfulskies.commands.color.sky.reset": "Reset sky color",
   "colorfulskies.networking.cloud_color.failed": "Failed to set cloud color %s",
   "colorfulskies.networking.moon_color.failed": "Failed to set moon color %s",
   "colorfulskies.networking.sun_color.failed": "Failed to set sun color %s",
   "colorfulskies.networking.sunrise_color.failed": "Failed to set sunrise color %s",
+  "colorfulskies.networking.sky_color.failed": "Failed to set sky color %s",
   "colorfulskies.networking.disable_sunrise.failed": "Failed to disable sunrise %s"
 }

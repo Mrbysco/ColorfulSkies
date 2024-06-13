@@ -3,7 +3,9 @@ package com.mrbysco.colorfulskies.world;
 import com.mrbysco.colorfulskies.ColorfulSkies;
 import com.mrbysco.colorfulskies.network.message.CloudColorPayload;
 import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
+import com.mrbysco.colorfulskies.network.message.SkyColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunColorPayload;
+import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
@@ -44,6 +46,7 @@ public class SkyColorData extends SavedData {
 			skyTag.putInt("Moon", entry.getValue().moon());
 			skyTag.putInt("Sun", entry.getValue().sun());
 			skyTag.putInt("Sunrise", entry.getValue().sunrise());
+			skyTag.putInt("Sky", entry.getValue().sky());
 			skyTag.putBoolean("DisableSunrise", entry.getValue().disableSunrise());
 
 			skyColorList.add(skyTag);
@@ -63,8 +66,9 @@ public class SkyColorData extends SavedData {
 			int moon = listTag.getInt("Moon");
 			int sun = listTag.getInt("Sun");
 			int sunrise = listTag.getInt("Sunrise");
+			int sky = listTag.getInt("Sky");
 			boolean disableSunrise = listTag.getBoolean("DisableSunrise");
-			skyColorMap.put(uuid, new SkyColorInfo(cloud, moon, sun, sunrise, disableSunrise));
+			skyColorMap.put(uuid, new SkyColorInfo(cloud, moon, sun, sunrise, sky, disableSunrise));
 		}
 		return new com.mrbysco.colorfulskies.world.SkyColorData(skyColorMap);
 	}
@@ -85,43 +89,51 @@ public class SkyColorData extends SavedData {
 	}
 
 	public void setCloudColorForUUID(UUID uuid, int color) {
-		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, false));
-		this.skyColorDataMap.put(uuid, new SkyColorInfo(color, info.moon(), info.sun(), info.sunrise(), info.disableSunrise()));
+		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, -1, false));
+		this.skyColorDataMap.put(uuid, new SkyColorInfo(color, info.moon(), info.sun(), info.sunrise(), info.sky(), info.disableSunrise()));
 		setDirty();
 	}
 
 	public void setMoonColorForUUID(UUID uuid, int color) {
-		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, false));
-		this.skyColorDataMap.put(uuid, new SkyColorInfo(info.cloud(), color, info.sun(), info.sunrise(), info.disableSunrise()));
+		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, -1, false));
+		this.skyColorDataMap.put(uuid, new SkyColorInfo(info.cloud(), color, info.sun(), info.sunrise(), info.sky(), info.disableSunrise()));
 		setDirty();
 	}
 
 	public void setSunColorForUUID(UUID uuid, int color) {
-		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, false));
-		this.skyColorDataMap.put(uuid, new SkyColorInfo(info.cloud(), info.moon(), color, info.sunrise(), info.disableSunrise()));
+		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, -1, false));
+		this.skyColorDataMap.put(uuid, new SkyColorInfo(info.cloud(), info.moon(), color, info.sunrise(), info.sky(), info.disableSunrise()));
 		setDirty();
 	}
 
 	public void setSunriseColorForUUID(UUID uuid, int color) {
-		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, false));
-		this.skyColorDataMap.put(uuid, new SkyColorInfo(info.cloud(), info.moon(), info.sun(), color, info.disableSunrise()));
+		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, -1, false));
+		this.skyColorDataMap.put(uuid, new SkyColorInfo(info.cloud(), info.moon(), info.sun(), color, info.sky(), info.disableSunrise()));
 		setDirty();
 	}
 
 	public void setSunriseDisabledForUUID(UUID uuid, boolean disabled) {
-		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, false));
-		this.skyColorDataMap.put(uuid, new SkyColorInfo(info.cloud(), info.moon(), info.sun(), info.sunrise(), disabled));
+		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, -1, false));
+		this.skyColorDataMap.put(uuid, new SkyColorInfo(info.cloud(), info.moon(), info.sun(), info.sunrise(), info.sky(), disabled));
+		setDirty();
+	}
+
+	public void setSkyColorForUUID(UUID uuid, int color) {
+		SkyColorInfo info = this.skyColorDataMap.getOrDefault(uuid, new SkyColorInfo(-1, -1, -1, -1, -1, false));
+		this.skyColorDataMap.put(uuid, new SkyColorInfo(info.cloud(), info.moon(), info.sun(), info.sunrise(), color, info.disableSunrise()));
 		setDirty();
 	}
 
 	public void syncColors(ServerPlayer player) {
-		SkyColorInfo info = this.skyColorDataMap.getOrDefault(player.getUUID(), new SkyColorInfo(-1, -1, -1, -1, false));
+		SkyColorInfo info = this.skyColorDataMap.getOrDefault(player.getUUID(), new SkyColorInfo(-1, -1, -1, -1, -1, false));
 		player.connection.send(new CloudColorPayload(info.cloud));
 		player.connection.send(new MoonColorPayload(info.moon));
 		player.connection.send(new SunColorPayload(info.sun));
+		player.connection.send(new SkyColorPayload(info.sky));
+		if(!info.disableSunrise) player.connection.send(new SunriseColorPayload(info.sun));
 	}
 
-	public record SkyColorInfo(int cloud, int moon, int sun, int sunrise, boolean disableSunrise) {
+	public record SkyColorInfo(int cloud, int moon, int sun, int sunrise, int sky, boolean disableSunrise) {
 
 	}
 }
