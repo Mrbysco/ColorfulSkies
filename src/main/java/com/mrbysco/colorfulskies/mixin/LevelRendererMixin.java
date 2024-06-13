@@ -1,6 +1,5 @@
 package com.mrbysco.colorfulskies.mixin;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrbysco.colorfulskies.client.ClientHandler;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -26,27 +25,29 @@ public class LevelRendererMixin {
 	@Nullable
 	private ClientLevel level;
 
-	@Inject(method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V", at = @At(
+	@Inject(method = "renderSky(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V", at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/client/multiplayer/ClientLevel;getMoonPhase()I",
 			shift = Shift.BEFORE,
 			ordinal = 0
 	))
-	private void colorfulskies_colorMoon(PoseStack poseStack, Matrix4f matrix4f, float partialTick, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci) {
+	private void colorfulskies_colorMoon(Matrix4f projectionMatrix, Matrix4f frustrumMatrix, float partialTick, Camera camera,
+	                                     boolean isFoggy, Runnable skyFogSetup, CallbackInfo ci) {
 		if (this.level != null) {
-			ClientHandler.colorTheMoon(level, poseStack, matrix4f, partialTick, camera);
+			ClientHandler.colorTheMoon(level, projectionMatrix, frustrumMatrix, partialTick, camera);
 		}
 	}
 
-	@Inject(method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V", at = @At(
+	@Inject(method = "renderSky(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V", at = @At(
 			value = "INVOKE",
 			target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V",
 			shift = Shift.AFTER,
 			ordinal = 0
 	))
-	private void colorfulskies_colorSun(PoseStack poseStack, Matrix4f matrix4f, float partialTick, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci) {
+	private void colorfulskies_colorSun(Matrix4f projectionMatrix, Matrix4f frustrumMatrix, float partialTick, Camera camera,
+	                                    boolean isFoggy, Runnable skyFogSetup, CallbackInfo ci) {
 		if (this.level != null) {
-			ClientHandler.colorTheSun(level, poseStack, matrix4f, partialTick, camera);
+			ClientHandler.colorTheSun(level, projectionMatrix, frustrumMatrix, partialTick, camera);
 		}
 	}
 

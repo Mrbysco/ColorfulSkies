@@ -20,13 +20,13 @@ public class ClientHandler {
 	private static Color moonColor, sunColor, cloudColor, sunriseColor, skyColor = null;
 	private static ResourceLocation moonTexture, sunTexture = null;
 
-	public static void colorTheMoon(ClientLevel level, PoseStack poseStack, Matrix4f matrix4f, float partialTick, Camera camera) {
+	public static void colorTheMoon(ClientLevel level, Matrix4f projectionMatrix, Matrix4f frustrumMatrix, float partialTick, Camera camera) {
 		if (moonColor != null) {
 			RenderSystem.setShaderColor(moonColor.red(), moonColor.green(), moonColor.blue(), 1.0F);
 		}
 	}
 
-	public static void colorTheSun(ClientLevel level, PoseStack poseStack, Matrix4f matrix4f, float partialTick, Camera camera) {
+	public static void colorTheSun(ClientLevel level, Matrix4f projectionMatrix, Matrix4f frustrumMatrix, float partialTick, Camera camera) {
 		if (sunColor != null) {
 			RenderSystem.setShaderColor(sunColor.red(), sunColor.green(), sunColor.blue(), 1.0F);
 		}

@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[2,)"
+loaderVersion="[3,)"
 issueTrackerURL="https://github.com/Mrbysco/ColorfulSkies/issues"
 license="MIT"
 
@@ -14,14 +14,14 @@ Wait... The sky isn't supposed to be pink? Well, it is now!
 '''
 [[dependencies.colorfulskies]]
 modId="minecraft"
-type="REQUIRED"
-versionRange="[1.20.4,1.21)"
+type="required"
+versionRange="[1.20.6,1.21)"
 ordering="NONE"
 side="BOTH"
 [[dependencies.colorfulskies]]
 modId="neoforge"
-type="REQUIRED"
-versionRange="[20.4.100-beta,)"
+type="required"
+versionRange="[20.6.78-beta,)"
 ordering="NONE"
 side="BOTH"
 [[mixins]]

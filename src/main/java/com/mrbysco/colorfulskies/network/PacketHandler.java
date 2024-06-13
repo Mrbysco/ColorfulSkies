@@ -8,25 +8,19 @@ import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
 import com.mrbysco.colorfulskies.network.message.SkyColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class PacketHandler {
 
-	public static void setupPackets(final RegisterPayloadHandlerEvent event) {
-		final IPayloadRegistrar registrar = event.registrar(ColorfulSkies.MOD_ID);
+	public static void setupPackets(final RegisterPayloadHandlersEvent event) {
+		final PayloadRegistrar registrar = event.registrar(ColorfulSkies.MOD_ID);
 
-		registrar.play(CloudColorPayload.ID, CloudColorPayload::new, handler -> handler
-				.client(ClientPayloadHandler.getInstance()::handleCloudData));
-		registrar.play(DisableSunrisePayload.ID, DisableSunrisePayload::new, handler -> handler
-				.client(ClientPayloadHandler.getInstance()::handleDisableData));
-		registrar.play(MoonColorPayload.ID, MoonColorPayload::new, handler -> handler
-				.client(ClientPayloadHandler.getInstance()::handleMoonData));
-		registrar.play(SunColorPayload.ID, SunColorPayload::new, handler -> handler
-				.client(ClientPayloadHandler.getInstance()::handleSunData));
-		registrar.play(SunriseColorPayload.ID, SunriseColorPayload::new, handler -> handler
-				.client(ClientPayloadHandler.getInstance()::handleSunriseData));
-		registrar.play(SkyColorPayload.ID, SkyColorPayload::new, handler -> handler
-				.client(ClientPayloadHandler.getInstance()::handleSkyData));
+		registrar.playToClient(CloudColorPayload.ID, CloudColorPayload.CODEC, ClientPayloadHandler.getInstance()::handleCloudData);
+		registrar.playToClient(DisableSunrisePayload.ID, DisableSunrisePayload.CODEC, ClientPayloadHandler.getInstance()::handleDisableData);
+		registrar.playToClient(MoonColorPayload.ID, MoonColorPayload.CODEC, ClientPayloadHandler.getInstance()::handleMoonData);
+		registrar.playToClient(SunColorPayload.ID, SunColorPayload.CODEC, ClientPayloadHandler.getInstance()::handleSunData);
+		registrar.playToClient(SunriseColorPayload.ID, SunriseColorPayload.CODEC, ClientPayloadHandler.getInstance()::handleSunriseData);
+		registrar.playToClient(SkyColorPayload.ID, SkyColorPayload.CODEC, ClientPayloadHandler.getInstance()::handleSkyData);
 	}
 }

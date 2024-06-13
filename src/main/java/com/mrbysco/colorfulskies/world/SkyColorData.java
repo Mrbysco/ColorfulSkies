@@ -6,6 +6,7 @@ import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
 import com.mrbysco.colorfulskies.network.message.SkyColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
@@ -32,7 +33,7 @@ public class SkyColorData extends SavedData {
 		this(new HashMap<>());
 	}
 
-	public CompoundTag save(CompoundTag tag) {
+	public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
 		saveMap(tag, skyColorDataMap);
 		return tag;
 	}
@@ -56,7 +57,7 @@ public class SkyColorData extends SavedData {
 		return tag;
 	}
 
-	public static com.mrbysco.colorfulskies.world.SkyColorData load(CompoundTag tag) {
+	public static com.mrbysco.colorfulskies.world.SkyColorData load(CompoundTag tag, HolderLookup.Provider registries) {
 		ListTag skyColorList = tag.getList("SkyColorMap", CompoundTag.TAG_COMPOUND);
 		Map<UUID, SkyColorInfo> skyColorMap = new HashMap<>();
 		for (int i = 0; i < skyColorList.size(); ++i) {
@@ -130,7 +131,7 @@ public class SkyColorData extends SavedData {
 		player.connection.send(new MoonColorPayload(info.moon));
 		player.connection.send(new SunColorPayload(info.sun));
 		player.connection.send(new SkyColorPayload(info.sky));
-		if(!info.disableSunrise) player.connection.send(new SunriseColorPayload(info.sun));
+		if (!info.disableSunrise) player.connection.send(new SunriseColorPayload(info.sun));
 	}
 
 	public record SkyColorInfo(int cloud, int moon, int sun, int sunrise, int sky, boolean disableSunrise) {
