@@ -10,7 +10,7 @@ public record SunriseColorPayload(int color) implements CustomPacketPayload {
 	public static final StreamCodec<FriendlyByteBuf, SunriseColorPayload> CODEC = CustomPacketPayload.codec(
 			SunriseColorPayload::write,
 			SunriseColorPayload::new);
-	public static final Type<SunriseColorPayload> ID = new Type<>(new ResourceLocation(ColorfulSkies.MOD_ID, "sunrise_color"));
+	public static final Type<SunriseColorPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "sunrise_color"));
 
 	@Override
 	public Type<? extends CustomPacketPayload> type() {

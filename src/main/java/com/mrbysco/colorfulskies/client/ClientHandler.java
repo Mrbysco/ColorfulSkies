@@ -1,7 +1,6 @@
 package com.mrbysco.colorfulskies.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mrbysco.colorfulskies.ColorfulSkies;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 public class ClientHandler {
-	public static final ResourceLocation CUSTOM_SUN_LOCATION = new ResourceLocation(ColorfulSkies.MOD_ID, "textures/environment/sun.png");
+	public static final ResourceLocation CUSTOM_SUN_LOCATION = ResourceLocation.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "textures/environment/sun.png");
 	public static boolean sunriseDisabled = false;
 
 	private static Color moonColor, sunColor, cloudColor, sunriseColor, skyColor = null;
@@ -125,12 +124,12 @@ public class ClientHandler {
 	}
 
 	public static Vec3 generateSkyColor(@NotNull Vec3 color, float timeOffDay, float rainLevel, float thunderLevel, int flashTime, float partialTick) {
-		float f1 = Mth.cos(timeOffDay * ((float)Math.PI * 2F)) * 2.0F + 0.5F;
+		float f1 = Mth.cos(timeOffDay * ((float) Math.PI * 2F)) * 2.0F + 0.5F;
 		System.out.println(f1);
 		f1 = Mth.clamp(f1, 0.1F, 1.0F);
-		float red = (float)color.x * f1;
-		float green = (float)color.y * f1;
-		float blue = (float)color.z * f1;
+		float red = (float) color.x * f1;
+		float green = (float) color.y * f1;
+		float blue = (float) color.z * f1;
 
 		if (rainLevel > 0.0F) {
 			float f6 = (red * 0.3F + green * 0.59F + blue * 0.11F) * 0.6F;
@@ -149,7 +148,7 @@ public class ClientHandler {
 		}
 
 		if (flashTime > 0) {
-			float f11 = (float)flashTime - partialTick;
+			float f11 = (float) flashTime - partialTick;
 			if (f11 > 1.0F) {
 				f11 = 1.0F;
 			}

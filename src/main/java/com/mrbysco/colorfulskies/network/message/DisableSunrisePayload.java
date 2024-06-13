@@ -10,7 +10,7 @@ public record DisableSunrisePayload(boolean disabled) implements CustomPacketPay
 	public static final StreamCodec<FriendlyByteBuf, DisableSunrisePayload> CODEC = CustomPacketPayload.codec(
 			DisableSunrisePayload::write,
 			DisableSunrisePayload::new);
-	public static final Type<DisableSunrisePayload> ID = new Type<>(new ResourceLocation(ColorfulSkies.MOD_ID, "disable_sunrise"));
+	public static final Type<DisableSunrisePayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "disable_sunrise"));
 
 	@Override
 	public Type<? extends CustomPacketPayload> type() {

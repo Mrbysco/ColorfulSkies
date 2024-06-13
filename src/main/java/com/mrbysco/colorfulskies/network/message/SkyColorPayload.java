@@ -10,7 +10,7 @@ public record SkyColorPayload(int color) implements CustomPacketPayload {
 	public static final StreamCodec<FriendlyByteBuf, SkyColorPayload> CODEC = CustomPacketPayload.codec(
 			SkyColorPayload::write,
 			SkyColorPayload::new);
-	public static final Type<SkyColorPayload> ID = new Type<>(new ResourceLocation(ColorfulSkies.MOD_ID, "sky_color"));
+	public static final Type<SkyColorPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "sky_color"));
 
 	@Override
 	public Type<? extends CustomPacketPayload> type() {

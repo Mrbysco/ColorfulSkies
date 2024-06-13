@@ -10,7 +10,7 @@ public record MoonColorPayload(int color) implements CustomPacketPayload {
 	public static final StreamCodec<FriendlyByteBuf, MoonColorPayload> CODEC = CustomPacketPayload.codec(
 			MoonColorPayload::write,
 			MoonColorPayload::new);
-	public static final Type<MoonColorPayload> ID = new Type<>(new ResourceLocation(ColorfulSkies.MOD_ID, "moon_color"));
+	public static final Type<MoonColorPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "moon_color"));
 
 	@Override
 	public Type<? extends CustomPacketPayload> type() {

@@ -10,7 +10,7 @@ public record CloudColorPayload(int color) implements CustomPacketPayload {
 	public static final StreamCodec<FriendlyByteBuf, CloudColorPayload> CODEC = CustomPacketPayload.codec(
 			CloudColorPayload::write,
 			CloudColorPayload::new);
-	public static final Type<CloudColorPayload> ID = new Type<>(new ResourceLocation(ColorfulSkies.MOD_ID, "cloud_color"));
+	public static final Type<CloudColorPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "cloud_color"));
 
 	@Override
 	public Type<? extends CustomPacketPayload> type() {
