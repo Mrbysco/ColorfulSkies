@@ -1,1 +1,1 @@
-* Initial update to 1.20.6
+* Sync disabled sunrise and sunrise color
