@@ -2,6 +2,7 @@ package com.mrbysco.colorfulskies.world;
 
 import com.mrbysco.colorfulskies.ColorfulSkies;
 import com.mrbysco.colorfulskies.network.message.CloudColorPayload;
+import com.mrbysco.colorfulskies.network.message.DisableSunrisePayload;
 import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
 import com.mrbysco.colorfulskies.network.message.SkyColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunColorPayload;
@@ -131,6 +132,7 @@ public class SkyColorData extends SavedData {
 		player.connection.send(new MoonColorPayload(info.moon));
 		player.connection.send(new SunColorPayload(info.sun));
 		player.connection.send(new SkyColorPayload(info.sky));
+		player.connection.send(new DisableSunrisePayload(info.disableSunrise));
 		if (!info.disableSunrise) player.connection.send(new SunriseColorPayload(info.sun));
 	}
 
