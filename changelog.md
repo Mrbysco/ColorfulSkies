@@ -1,1 +1,1 @@
-* Sync disabled sunrise and sunrise color
+* Remove leftover logging
