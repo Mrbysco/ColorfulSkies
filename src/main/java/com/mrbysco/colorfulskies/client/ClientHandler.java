@@ -126,7 +126,6 @@ public class ClientHandler {
 
 	public static Vec3 generateSkyColor(@NotNull Vec3 color, float timeOffDay, float rainLevel, float thunderLevel, int flashTime, float partialTick) {
 		float f1 = Mth.cos(timeOffDay * ((float)Math.PI * 2F)) * 2.0F + 0.5F;
-		System.out.println(f1);
 		f1 = Mth.clamp(f1, 0.1F, 1.0F);
 		float red = (float)color.x * f1;
 		float green = (float)color.y * f1;
