@@ -1,1 +1,1 @@
-* Fix sunrise color
+* Fix sunrise color not persisting after rejoining the world
