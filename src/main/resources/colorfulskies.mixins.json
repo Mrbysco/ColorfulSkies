@@ -9,7 +9,7 @@
   "client": [
     "ClientLevelDataMixin",
     "ClientLevelMixin",
-    "LevelRendererMixin"
+    "SkyRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

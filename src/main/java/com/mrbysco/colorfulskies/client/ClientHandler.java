@@ -1,10 +1,13 @@
 package com.mrbysco.colorfulskies.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.mrbysco.colorfulskies.ColorfulSkies;
-import net.minecraft.client.Camera;
-import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.phys.Vec3;
@@ -19,33 +22,35 @@ public class ClientHandler {
 	private static Color moonColor, sunColor, cloudColor, sunriseColor, skyColor = null;
 	private static ResourceLocation moonTexture, sunTexture = null;
 
-	public static void colorTheMoon(ClientLevel level, Matrix4f projectionMatrix, Matrix4f frustrumMatrix, float partialTick, Camera camera) {
+	public static int colorTheMoon(int originalColor) {
 		if (moonColor != null) {
-			RenderSystem.setShaderColor(moonColor.red(), moonColor.green(), moonColor.blue(), 1.0F);
+			return ARGB.colorFromFloat(1.0F, moonColor.red(), moonColor.green(), moonColor.blue());
 		}
+		return originalColor;
 	}
 
-	public static void colorTheSun(ClientLevel level, Matrix4f projectionMatrix, Matrix4f frustrumMatrix, float partialTick, Camera camera) {
-		if (sunColor != null) {
-			RenderSystem.setShaderColor(sunColor.red(), sunColor.green(), sunColor.blue(), 1.0F);
+	public static int colorTheSun(int originalColor) {
+		if (moonColor != null) {
+			return ARGB.colorFromFloat(1.0F, sunColor.red(), sunColor.green(), sunColor.blue());
 		}
+		return originalColor;
 	}
 
-	public static Vec3 getCloudColor() {
+	public static Integer getCloudColor() {
 		if (cloudColor != null) {
-			return new Vec3(cloudColor.red(), cloudColor.green(), cloudColor.blue());
+			return cloudColor.original();
+		}
+		return null;
+	}
+
+	public static Integer getSunriseColor() {
+		if (sunriseColor != null) {
+			return sunriseColor.original();
 		}
 		return null;
 	}
 
 	public static Vec3 getSkyColor() {
-		if (skyColor != null) {
-			return new Vec3(skyColor.red(), skyColor.green(), skyColor.blue());
-		}
-		return null;
-	}
-
-	public static Vec3 generateSkyColor(Vec3 color, float timeOfDay, float partialTicks) {
 		if (skyColor != null) {
 			return new Vec3(skyColor.red(), skyColor.green(), skyColor.blue());
 		}
@@ -90,7 +95,7 @@ public class ClientHandler {
 	}
 
 	public static double getHorizon(LevelHeightAccessor reader) {
-		return reader.getMinBuildHeight() - 128D;
+		return reader.getMinY() - 128D;
 	}
 
 
@@ -123,42 +128,52 @@ public class ClientHandler {
 		sunTexture = location;
 	}
 
-	public static Vec3 generateSkyColor(@NotNull Vec3 color, float timeOffDay, float rainLevel, float thunderLevel, int flashTime, float partialTick) {
-		float f1 = Mth.cos(timeOffDay * ((float) Math.PI * 2F)) * 2.0F + 0.5F;
-		System.out.println(f1);
-		f1 = Mth.clamp(f1, 0.1F, 1.0F);
-		float red = (float) color.x * f1;
-		float green = (float) color.y * f1;
-		float blue = (float) color.z * f1;
+	public static void renderCustomSunrise(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float sunAngle) {
+		int color = sunriseColor.original();
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+		float f = Mth.sin(sunAngle) < 0.0F ? 180.0F : 0.0F;
+		poseStack.mulPose(Axis.ZP.rotationDegrees(f));
+		poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
+		Matrix4f matrix4f = poseStack.last().pose();
+		VertexConsumer vertexconsumer = bufferSource.getBuffer(RenderType.sunriseSunset());
+		float f1 = ARGB.alphaFloat(color);
+		vertexconsumer.addVertex(matrix4f, 0.0F, 100.0F, 0.0F).setColor(color);
+		int i = ARGB.transparent(color);
 
+		for (int k = 0; k <= 16; k++) {
+			float f2 = (float)k * (float) (Math.PI * 2) / 16.0F;
+			float f3 = Mth.sin(f2);
+			float f4 = Mth.cos(f2);
+			vertexconsumer.addVertex(matrix4f, f3 * 120.0F, f4 * 120.0F, -f4 * 40.0F * f1).setColor(i);
+		}
+
+		poseStack.popPose();
+	}
+
+	public static int generateSkyColor(@NotNull Vec3 color, float timeOffDay, float rainLevel, float thunderLevel, int flashTime, float partialTick) {
+		float f1 = Mth.cos(timeOffDay * (float) (Math.PI * 2)) * 2.0F + 0.5F;
+		f1 = Mth.clamp(f1, 0.0F, 1.0F);
+		color = color.scale(f1);
+		int i = ARGB.color(color);
 		if (rainLevel > 0.0F) {
-			float f6 = (red * 0.3F + green * 0.59F + blue * 0.11F) * 0.6F;
-			float f7 = 1.0F - rainLevel * 0.75F;
-			red = red * f7 + f6 * (1.0F - f7);
-			green = green * f7 + f6 * (1.0F - f7);
-			blue = blue * f7 + f6 * (1.0F - f7);
+			float f4 = rainLevel * 0.75F;
+			int j = ARGB.scaleRGB(ARGB.greyscale(i), 0.6F);
+			i = ARGB.lerp(f4, i, j);
 		}
 
 		if (thunderLevel > 0.0F) {
-			float f10 = (red * 0.3F + green * 0.59F + blue * 0.11F) * 0.2F;
-			float f8 = 1.0F - thunderLevel * 0.75F;
-			red = red * f8 + f10 * (1.0F - f8);
-			green = green * f8 + f10 * (1.0F - f8);
-			blue = blue * f8 + f10 * (1.0F - f8);
+			float f7 = thunderLevel * 0.75F;
+			int k = ARGB.scaleRGB(ARGB.greyscale(i), 0.2F);
+			i = ARGB.lerp(f7, i, k);
 		}
 
 		if (flashTime > 0) {
-			float f11 = (float) flashTime - partialTick;
-			if (f11 > 1.0F) {
-				f11 = 1.0F;
-			}
-
-			f11 *= 0.45F;
-			red = red * (1.0F - f11) + 0.8F * f11;
-			green = green * (1.0F - f11) + 0.8F * f11;
-			blue = blue * (1.0F - f11) + 1.0F * f11;
+			float f8 = Math.min((float)flashTime - partialTick, 1.0F);
+			f8 *= 0.45F;
+			i = ARGB.lerp(f8, i, ARGB.color(204, 204, 255));
 		}
 
-		return new Vec3(red, green, blue);
+		return i;
 	}
 }

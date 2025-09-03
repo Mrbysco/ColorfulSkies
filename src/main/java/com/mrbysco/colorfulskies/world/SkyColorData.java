@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.storage.DimensionDataStorage;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.UUID;
 public class SkyColorData extends SavedData {
 	private static final String DATA_NAME = ColorfulSkies.MOD_ID + "_world_data";
 
-	private static final Map<UUID, SkyColorInfo> skyColorDataMap = new HashMap<>();
+	private final Map<UUID, SkyColorInfo> skyColorDataMap = new HashMap<>();
 
 	public SkyColorData(Map<UUID, SkyColorInfo> dataMap) {
 		this.skyColorDataMap.clear();
@@ -34,14 +35,14 @@ public class SkyColorData extends SavedData {
 		this(new HashMap<>());
 	}
 
-	public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-		saveMap(tag, skyColorDataMap);
-		return tag;
+	@NotNull
+	public CompoundTag save(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
+		return saveMap(tag, skyColorDataMap);
 	}
 
 	private static CompoundTag saveMap(CompoundTag tag, Map<UUID, SkyColorInfo> map) {
 		ListTag skyColorList = new ListTag();
-		for (Map.Entry<UUID, SkyColorInfo> entry : skyColorDataMap.entrySet()) {
+		for (Map.Entry<UUID, SkyColorInfo> entry : map.entrySet()) {
 			CompoundTag skyTag = new CompoundTag();
 			skyTag.putUUID("UUID", entry.getKey());
 			skyTag.putInt("Cloud", entry.getValue().cloud());
@@ -58,7 +59,7 @@ public class SkyColorData extends SavedData {
 		return tag;
 	}
 
-	public static com.mrbysco.colorfulskies.world.SkyColorData load(CompoundTag tag, HolderLookup.Provider registries) {
+	public static SkyColorData load(CompoundTag tag, HolderLookup.Provider registries) {
 		ListTag skyColorList = tag.getList("SkyColorMap", CompoundTag.TAG_COMPOUND);
 		Map<UUID, SkyColorInfo> skyColorMap = new HashMap<>();
 		for (int i = 0; i < skyColorList.size(); ++i) {
@@ -72,10 +73,10 @@ public class SkyColorData extends SavedData {
 			boolean disableSunrise = listTag.getBoolean("DisableSunrise");
 			skyColorMap.put(uuid, new SkyColorInfo(cloud, moon, sun, sunrise, sky, disableSunrise));
 		}
-		return new com.mrbysco.colorfulskies.world.SkyColorData(skyColorMap);
+		return new SkyColorData(skyColorMap);
 	}
 
-	public static com.mrbysco.colorfulskies.world.SkyColorData get(Level level) {
+	public static SkyColorData get(Level level) {
 		if (!(level instanceof ServerLevel)) {
 			throw new RuntimeException("Attempted to get the data from a client world. This is wrong.");
 		}
