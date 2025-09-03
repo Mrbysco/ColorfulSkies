@@ -1,5 +1,7 @@
 package com.mrbysco.colorfulskies.world;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.mrbysco.colorfulskies.ColorfulSkies;
 import com.mrbysco.colorfulskies.network.message.CloudColorPayload;
 import com.mrbysco.colorfulskies.network.message.DisableSunrisePayload;
@@ -7,15 +9,13 @@ import com.mrbysco.colorfulskies.network.message.MoonColorPayload;
 import com.mrbysco.colorfulskies.network.message.SkyColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.level.storage.DimensionDataStorage;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +23,14 @@ import java.util.UUID;
 
 public class SkyColorData extends SavedData {
 	private static final String DATA_NAME = ColorfulSkies.MOD_ID + "_world_data";
+
+	private static final Codec<Map<UUID, SkyColorInfo>> MAP_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, SkyColorInfo.CODEC);
+	private static final Codec<SkyColorData> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+					MAP_CODEC
+							.fieldOf("skyColorDataMap").forGetter(data -> data.skyColorDataMap)
+			)
+			.apply(inst, SkyColorData::new));
+
 
 	private final Map<UUID, SkyColorInfo> skyColorDataMap = new HashMap<>();
 
@@ -35,45 +43,8 @@ public class SkyColorData extends SavedData {
 		this(new HashMap<>());
 	}
 
-	@NotNull
-	public CompoundTag save(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registries) {
-		return saveMap(tag, skyColorDataMap);
-	}
-
-	private static CompoundTag saveMap(CompoundTag tag, Map<UUID, SkyColorInfo> map) {
-		ListTag skyColorList = new ListTag();
-		for (Map.Entry<UUID, SkyColorInfo> entry : map.entrySet()) {
-			CompoundTag skyTag = new CompoundTag();
-			skyTag.putUUID("UUID", entry.getKey());
-			skyTag.putInt("Cloud", entry.getValue().cloud());
-			skyTag.putInt("Moon", entry.getValue().moon());
-			skyTag.putInt("Sun", entry.getValue().sun());
-			skyTag.putInt("Sunrise", entry.getValue().sunrise());
-			skyTag.putInt("Sky", entry.getValue().sky());
-			skyTag.putBoolean("DisableSunrise", entry.getValue().disableSunrise());
-
-			skyColorList.add(skyTag);
-		}
-		tag.put("SkyColorMap", skyColorList);
-
-		return tag;
-	}
-
-	public static SkyColorData load(CompoundTag tag, HolderLookup.Provider registries) {
-		ListTag skyColorList = tag.getList("SkyColorMap", CompoundTag.TAG_COMPOUND);
-		Map<UUID, SkyColorInfo> skyColorMap = new HashMap<>();
-		for (int i = 0; i < skyColorList.size(); ++i) {
-			CompoundTag listTag = skyColorList.getCompound(i);
-			UUID uuid = listTag.getUUID("UUID");
-			int cloud = listTag.getInt("Cloud");
-			int moon = listTag.getInt("Moon");
-			int sun = listTag.getInt("Sun");
-			int sunrise = listTag.getInt("Sunrise");
-			int sky = listTag.getInt("Sky");
-			boolean disableSunrise = listTag.getBoolean("DisableSunrise");
-			skyColorMap.put(uuid, new SkyColorInfo(cloud, moon, sun, sunrise, sky, disableSunrise));
-		}
-		return new SkyColorData(skyColorMap);
+	public static SavedDataType<SkyColorData> type() {
+		return new SavedDataType<>(DATA_NAME, SkyColorData::new, CODEC, null);
 	}
 
 	public static SkyColorData get(Level level) {
@@ -82,8 +53,9 @@ public class SkyColorData extends SavedData {
 		}
 		ServerLevel overworld = level.getServer().getLevel(Level.OVERWORLD);
 
+		assert overworld != null;
 		DimensionDataStorage storage = overworld.getDataStorage();
-		return storage.computeIfAbsent(new Factory<>(SkyColorData::new, SkyColorData::load), DATA_NAME);
+		return storage.computeIfAbsent(type());
 	}
 
 	public void setColorForUUID(UUID uuid, SkyColorInfo colorInfo) {
@@ -138,6 +110,16 @@ public class SkyColorData extends SavedData {
 	}
 
 	public record SkyColorInfo(int cloud, int moon, int sun, int sunrise, int sky, boolean disableSunrise) {
-
+		public static Codec<SkyColorInfo> CODEC = RecordCodecBuilder.create(
+				instance -> instance.group(
+								Codec.INT.fieldOf("Cloud").forGetter(SkyColorInfo::cloud),
+								Codec.INT.fieldOf("Moon").forGetter(SkyColorInfo::moon),
+								Codec.INT.fieldOf("Sun").forGetter(SkyColorInfo::sun),
+								Codec.INT.fieldOf("Sunrise").forGetter(SkyColorInfo::sunrise),
+								Codec.INT.fieldOf("Sky").forGetter(SkyColorInfo::sky),
+								Codec.BOOL.fieldOf("DisableSunrise").forGetter(SkyColorInfo::disableSunrise)
+						)
+						.apply(instance, SkyColorInfo::new)
+		);
 	}
 }

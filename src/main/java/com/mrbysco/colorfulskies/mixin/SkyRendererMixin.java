@@ -37,16 +37,6 @@ public class SkyRendererMixin {
 	}
 
 	@ModifyArg(
-			method = "renderMoon(IFLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
-			at = @At(
-					value = "INVOKE",
-					target = "Lnet/minecraft/client/renderer/RenderType;celestial(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/renderer/RenderType;"),
-			index = 0)
-	public ResourceLocation colorfulskies_changeMoonTexture(ResourceLocation location) {
-		return ClientHandler.getMoonTexture(location);
-	}
-
-	@ModifyArg(
 			method = "renderSun(FLnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/PoseStack;)V",
 			at = @At(
 					value = "INVOKE",

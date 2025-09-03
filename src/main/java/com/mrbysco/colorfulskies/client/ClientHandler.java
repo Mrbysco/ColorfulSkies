@@ -20,7 +20,7 @@ public class ClientHandler {
 	public static boolean sunriseDisabled = false;
 
 	private static Color moonColor, sunColor, cloudColor, sunriseColor, skyColor = null;
-	private static ResourceLocation moonTexture, sunTexture = null;
+	private static ResourceLocation sunTexture = null;
 
 	public static int colorTheMoon(int originalColor) {
 		if (moonColor != null) {
@@ -55,13 +55,6 @@ public class ClientHandler {
 			return new Vec3(skyColor.red(), skyColor.green(), skyColor.blue());
 		}
 		return null;
-	}
-
-	public static ResourceLocation getMoonTexture(ResourceLocation defaultTexture) {
-		if (moonTexture != null) {
-			return moonTexture;
-		}
-		return defaultTexture;
 	}
 
 	public static ResourceLocation getSunTexture(ResourceLocation defaultTexture) {
@@ -120,16 +113,12 @@ public class ClientHandler {
 		skyColor = color;
 	}
 
-	public static void setMoonTexture(@Nullable ResourceLocation location) {
-		moonTexture = location;
-	}
-
 	public static void setSunTexture(@Nullable ResourceLocation location) {
 		sunTexture = location;
 	}
 
 	public static void renderCustomSunrise(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float sunAngle) {
-		int color = sunriseColor.original();
+		int color = ARGB.opaque(sunriseColor.original());
 		poseStack.pushPose();
 		poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
 		float f = Mth.sin(sunAngle) < 0.0F ? 180.0F : 0.0F;
