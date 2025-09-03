@@ -1,1 +1,1 @@
-* Update to 1.21.5
+* Fix sunrise color not persisting after rejoining the world
