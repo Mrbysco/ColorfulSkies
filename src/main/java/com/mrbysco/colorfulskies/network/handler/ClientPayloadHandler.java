@@ -9,6 +9,7 @@ import com.mrbysco.colorfulskies.network.message.SkyColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FastColor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientPayloadHandler {
@@ -24,9 +25,9 @@ public class ClientPayloadHandler {
 			if (color == -1) {
 				com.mrbysco.colorfulskies.client.ClientHandler.setCloudColor(null);
 			} else {
-				int r = (color >> 16) & 0xFF;
-				int g = (color >> 8) & 0xFF;
-				int b = (color >> 0) & 0xFF;
+				int r = FastColor.ARGB32.red(color);
+				int g = FastColor.ARGB32.green(color);
+				int b = FastColor.ARGB32.blue(color);
 				com.mrbysco.colorfulskies.client.ClientHandler.setCloudColor(new Color((float) r / 255.0F, (float) g / 255.0F, (float) b / 255.0F));
 			}
 		}).exceptionally(e -> {
