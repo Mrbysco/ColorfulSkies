@@ -43,9 +43,9 @@ public class ClientPayloadHandler {
 			if (color == -1) {
 				com.mrbysco.colorfulskies.client.ClientHandler.setMoonColor(null);
 			} else {
-				int r = (color >> 16) & 0xFF;
-				int g = (color >> 8) & 0xFF;
-				int b = (color >> 0) & 0xFF;
+				int r = FastColor.ARGB32.red(color);
+				int g = FastColor.ARGB32.green(color);
+				int b = FastColor.ARGB32.blue(color);
 				com.mrbysco.colorfulskies.client.ClientHandler.setMoonColor(new Color((float) r / 255.0F, (float) g / 255.0F, (float) b / 255.0F));
 			}
 		}).exceptionally(e -> {
@@ -62,9 +62,9 @@ public class ClientPayloadHandler {
 				com.mrbysco.colorfulskies.client.ClientHandler.setSunColor(null);
 				com.mrbysco.colorfulskies.client.ClientHandler.setSunTexture(null);
 			} else {
-				int r = (color >> 16) & 0xFF;
-				int g = (color >> 8) & 0xFF;
-				int b = (color >> 0) & 0xFF;
+				int r = FastColor.ARGB32.red(color);
+				int g = FastColor.ARGB32.green(color);
+				int b = FastColor.ARGB32.blue(color);
 				com.mrbysco.colorfulskies.client.ClientHandler.setSunColor(new Color((float) r / 255.0F, (float) g / 255.0F, (float) b / 255.0F));
 				com.mrbysco.colorfulskies.client.ClientHandler.setSunTexture(ClientHandler.CUSTOM_SUN_LOCATION);
 			}
@@ -81,9 +81,9 @@ public class ClientPayloadHandler {
 			if (color == -1) {
 				com.mrbysco.colorfulskies.client.ClientHandler.setSunriseColor(null);
 			} else {
-				int r = (color >> 16) & 0xFF;
-				int g = (color >> 8) & 0xFF;
-				int b = (color >> 0) & 0xFF;
+				int r = FastColor.ARGB32.red(color);
+				int g = FastColor.ARGB32.green(color);
+				int b = FastColor.ARGB32.blue(color);
 				com.mrbysco.colorfulskies.client.ClientHandler.setSunriseColor(new Color((float) r / 255.0F, (float) g / 255.0F, (float) b / 255.0F));
 			}
 		}).exceptionally(e -> {
@@ -99,9 +99,9 @@ public class ClientPayloadHandler {
 			if (color == -1) {
 				com.mrbysco.colorfulskies.client.ClientHandler.setSkyColor(null);
 			} else {
-				int r = (color >> 16) & 0xFF;
-				int g = (color >> 8) & 0xFF;
-				int b = (color >> 0) & 0xFF;
+				int r = FastColor.ARGB32.red(color);
+				int g = FastColor.ARGB32.green(color);
+				int b = FastColor.ARGB32.blue(color);
 				com.mrbysco.colorfulskies.client.ClientHandler.setSkyColor(new Color((float) r / 255.0F, (float) g / 255.0F, (float) b / 255.0F));
 			}
 		}).exceptionally(e -> {
