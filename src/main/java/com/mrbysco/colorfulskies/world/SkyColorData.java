@@ -106,7 +106,7 @@ public class SkyColorData extends SavedData {
 		player.connection.send(new SunColorPayload(info.sun));
 		player.connection.send(new SkyColorPayload(info.sky));
 		player.connection.send(new DisableSunrisePayload(info.disableSunrise));
-		if (!info.disableSunrise) player.connection.send(new SunriseColorPayload(info.sun));
+		if (!info.disableSunrise) player.connection.send(new SunriseColorPayload(info.sunrise));
 	}
 
 	public record SkyColorInfo(int cloud, int moon, int sun, int sunrise, int sky, boolean disableSunrise) {
