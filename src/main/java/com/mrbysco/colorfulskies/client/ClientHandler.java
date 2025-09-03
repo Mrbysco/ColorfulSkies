@@ -129,7 +129,7 @@ public class ClientHandler {
 	}
 
 	public static void renderCustomSunrise(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float sunAngle) {
-		int color = sunriseColor.original();
+		int color = ARGB.opaque(sunriseColor.original());
 		poseStack.pushPose();
 		poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
 		float f = Mth.sin(sunAngle) < 0.0F ? 180.0F : 0.0F;
