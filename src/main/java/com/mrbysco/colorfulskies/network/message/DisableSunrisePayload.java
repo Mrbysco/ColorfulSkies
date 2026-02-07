@@ -4,13 +4,13 @@ import com.mrbysco.colorfulskies.ColorfulSkies;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record DisableSunrisePayload(boolean disabled) implements CustomPacketPayload {
 	public static final StreamCodec<FriendlyByteBuf, DisableSunrisePayload> CODEC = CustomPacketPayload.codec(
 			DisableSunrisePayload::write,
 			DisableSunrisePayload::new);
-	public static final Type<DisableSunrisePayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "disable_sunrise"));
+	public static final Type<DisableSunrisePayload> ID = new Type<>(Identifier.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "disable_sunrise"));
 
 	@Override
 	public Type<? extends CustomPacketPayload> type() {

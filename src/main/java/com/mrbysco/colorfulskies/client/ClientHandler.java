@@ -1,37 +1,53 @@
 package com.mrbysco.colorfulskies.client;
 
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import com.mrbysco.colorfulskies.ColorfulSkies;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.LevelHeightAccessor;
-import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.joml.Vector4fc;
+
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
 
 public class ClientHandler {
-	public static final ResourceLocation CUSTOM_SUN_LOCATION = ResourceLocation.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "textures/environment/sun.png");
+	public static final Identifier CUSTOM_SUN_LOCATION = Identifier.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "sun");
 	public static boolean sunriseDisabled = false;
 
 	private static Color moonColor, sunColor, cloudColor, sunriseColor, skyColor = null;
-	private static ResourceLocation sunTexture = null;
+	private static Identifier sunTexture = null;
 
-	public static int colorTheMoon(int originalColor) {
+	public static Vector4fc colorTheMoon(Vector4fc originalColor) {
 		if (moonColor != null) {
-			return ARGB.colorFromFloat(1.0F, moonColor.red(), moonColor.green(), moonColor.blue());
+			return new Vector4f(moonColor.red(), moonColor.green(), moonColor.blue(), 1.0F);
 		}
 		return originalColor;
 	}
 
-	public static int colorTheSun(int originalColor) {
-		if (moonColor != null) {
-			return ARGB.colorFromFloat(1.0F, sunColor.red(), sunColor.green(), sunColor.blue());
+	public static Vector4fc colorTheSun(Vector4fc originalColor, float rainBrightness) {
+		if (sunColor != null) {
+			return new Vector4f(sunColor.red(), sunColor.green(), sunColor.blue(), rainBrightness);
+		}
+		return originalColor;
+	}
+
+	public static Vector4fc colorTheSky(Vector4fc originalColor) {
+		if (skyColor != null) {
+			return ARGB.vector4fFromARGB32(skyColor.original());
 		}
 		return originalColor;
 	}
@@ -50,41 +66,8 @@ public class ClientHandler {
 		return null;
 	}
 
-	public static Vec3 getSkyColor() {
-		if (skyColor != null) {
-			return new Vec3(skyColor.red(), skyColor.green(), skyColor.blue());
-		}
-		return null;
-	}
-
-	public static ResourceLocation getSunTexture(ResourceLocation defaultTexture) {
-		if (sunTexture != null) {
-			return sunTexture;
-		}
-		return defaultTexture;
-	}
-
-	public static float[] getSunriseColors(float[] sunriseColors, float timeOfDay, float partialTicks) {
-		if (ClientHandler.sunriseDisabled) {
-			return null;
-		}
-		if (sunriseColor != null) {
-			float[] sunriseCol = new float[4];
-			float f1 = Mth.cos(timeOfDay * ((float) Math.PI * 2F));
-			if (f1 >= -0.4F && f1 <= 0.4F) {
-				float f3 = f1 / 0.4F * 0.5F + 0.5F;
-				float f4 = 1.0F - (1.0F - Mth.sin(f3 * (float) Math.PI)) * 0.99F;
-				f4 *= f4;
-				sunriseCol[0] = f3 * 0.3F + sunriseColor.red();
-				sunriseCol[1] = f3 * f3 * 0.7F + sunriseColor.green();
-				sunriseCol[2] = f3 * f3 * 0.0F + sunriseColor.blue();
-				sunriseCol[3] = f4;
-				return sunriseCol;
-			} else {
-				return null;
-			}
-		}
-		return sunriseColors;
+	public static boolean hasSunTexture() {
+		return sunTexture != null;
 	}
 
 	public static double getHorizon(LevelHeightAccessor reader) {
@@ -113,56 +96,39 @@ public class ClientHandler {
 		skyColor = color;
 	}
 
-	public static void setSunTexture(@Nullable ResourceLocation location) {
+	public static void setSunTexture(@Nullable Identifier location) {
 		sunTexture = location;
 	}
 
-	public static void renderCustomSunrise(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, float sunAngle) {
-		int color = ARGB.opaque(sunriseColor.original());
-		poseStack.pushPose();
-		poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-		float f = Mth.sin(sunAngle) < 0.0F ? 180.0F : 0.0F;
-		poseStack.mulPose(Axis.ZP.rotationDegrees(f));
-		poseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
-		Matrix4f matrix4f = poseStack.last().pose();
-		VertexConsumer vertexconsumer = bufferSource.getBuffer(RenderType.sunriseSunset());
-		float f1 = ARGB.alphaFloat(color);
-		vertexconsumer.addVertex(matrix4f, 0.0F, 100.0F, 0.0F).setColor(color);
-		int i = ARGB.transparent(color);
+	public static void renderCustomSunrise(PoseStack poseStack, float sunAngle, GpuBuffer sunriseBuffer) {
+		float alpha = ARGB.alphaFloat(sunriseColor.original());
+		if (!(alpha <= 0.001F)) {
+			poseStack.pushPose();
+			poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+			float f1 = Mth.sin(sunAngle) < 0.0F ? 180.0F : 0.0F;
+			poseStack.mulPose(Axis.ZP.rotationDegrees(f1 + 90.0F));
+			Matrix4fStack matrix4fstack = RenderSystem.getModelViewStack();
+			matrix4fstack.pushMatrix();
+			matrix4fstack.mul(poseStack.last().pose());
+			matrix4fstack.scale(1.0F, 1.0F, alpha);
 
-		for (int k = 0; k <= 16; k++) {
-			float f2 = (float)k * (float) (Math.PI * 2) / 16.0F;
-			float f3 = Mth.sin(f2);
-			float f4 = Mth.cos(f2);
-			vertexconsumer.addVertex(matrix4f, f3 * 120.0F, f4 * 120.0F, -f4 * 40.0F * f1).setColor(i);
+			GpuBufferSlice gpubufferslice = RenderSystem.getDynamicUniforms()
+					.writeTransform(matrix4fstack, ARGB.vector4fFromARGB32(sunriseColor.original()), new Vector3f(), new Matrix4f());
+			GpuTextureView gputextureview = Minecraft.getInstance().getMainRenderTarget().getColorTextureView();
+			GpuTextureView gputextureview1 = Minecraft.getInstance().getMainRenderTarget().getDepthTextureView();
+
+			try (RenderPass renderpass = RenderSystem.getDevice()
+					.createCommandEncoder()
+					.createRenderPass(() -> "Sunrise sunset", gputextureview, OptionalInt.empty(), gputextureview1, OptionalDouble.empty())) {
+				renderpass.setPipeline(RenderPipelines.SUNRISE_SUNSET);
+				RenderSystem.bindDefaultUniforms(renderpass);
+				renderpass.setUniform("DynamicTransforms", gpubufferslice);
+				renderpass.setVertexBuffer(0, sunriseBuffer);
+				renderpass.draw(0, 18);
+			}
+
+			matrix4fstack.popMatrix();
+			poseStack.popPose();
 		}
-
-		poseStack.popPose();
-	}
-
-	public static int generateSkyColor(@NotNull Vec3 color, float timeOffDay, float rainLevel, float thunderLevel, int flashTime, float partialTick) {
-		float f1 = Mth.cos(timeOffDay * (float) (Math.PI * 2)) * 2.0F + 0.5F;
-		f1 = Mth.clamp(f1, 0.0F, 1.0F);
-		color = color.scale(f1);
-		int i = ARGB.color(color);
-		if (rainLevel > 0.0F) {
-			float f4 = rainLevel * 0.75F;
-			int j = ARGB.scaleRGB(ARGB.greyscale(i), 0.6F);
-			i = ARGB.lerp(f4, i, j);
-		}
-
-		if (thunderLevel > 0.0F) {
-			float f7 = thunderLevel * 0.75F;
-			int k = ARGB.scaleRGB(ARGB.greyscale(i), 0.2F);
-			i = ARGB.lerp(f7, i, k);
-		}
-
-		if (flashTime > 0) {
-			float f8 = Math.min((float)flashTime - partialTick, 1.0F);
-			f8 *= 0.45F;
-			i = ARGB.lerp(f8, i, ARGB.color(204, 204, 255));
-		}
-
-		return i;
 	}
 }

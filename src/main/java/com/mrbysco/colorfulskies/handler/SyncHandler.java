@@ -10,7 +10,7 @@ public class SyncHandler {
 	@SubscribeEvent
 	public void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
 		Player player = event.getEntity();
-		if (!player.level().isClientSide) {
+		if (!player.level().isClientSide()) {
 			SkyColorData colorData = SkyColorData.get(player.level());
 			colorData.syncColors((ServerPlayer) player);
 		}

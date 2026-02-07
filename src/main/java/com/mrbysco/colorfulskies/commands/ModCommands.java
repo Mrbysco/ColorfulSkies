@@ -28,7 +28,7 @@ import java.util.Collections;
 public class ModCommands {
 	public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
 		final LiteralArgumentBuilder<CommandSourceStack> root = Commands.literal(ColorfulSkies.MOD_ID);
-		root.requires((sourceStack) -> sourceStack.hasPermission(2))
+		root.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 				.then(Commands.literal("disablesunrise")
 						.then(Commands.argument("players", EntityArgument.players())
 								.then(Commands.argument("disabled", BoolArgumentType.bool()).executes(ModCommands::disableSunrise)))

@@ -4,13 +4,13 @@ import com.mrbysco.colorfulskies.ColorfulSkies;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record SkyColorPayload(int color) implements CustomPacketPayload {
 	public static final StreamCodec<FriendlyByteBuf, SkyColorPayload> CODEC = CustomPacketPayload.codec(
 			SkyColorPayload::write,
 			SkyColorPayload::new);
-	public static final Type<SkyColorPayload> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "sky_color"));
+	public static final Type<SkyColorPayload> ID = new Type<>(Identifier.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "sky_color"));
 
 	@Override
 	public Type<? extends CustomPacketPayload> type() {

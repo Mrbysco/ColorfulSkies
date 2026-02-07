@@ -1,47 +1,28 @@
 package com.mrbysco.colorfulskies.mixin;
 
 import com.mrbysco.colorfulskies.client.ClientHandler;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.storage.WritableLevelData;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.util.ARGB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-@Mixin(ClientLevel.class)
-public abstract class ClientLevelMixin extends Level {
+@Mixin(LevelRenderer.class)
+public abstract class ClientLevelMixin implements ResourceManagerReloadListener, AutoCloseable {
 
-	protected ClientLevelMixin(WritableLevelData levelData, ResourceKey<Level> dimension, RegistryAccess registryAccess,
-	                           Holder<DimensionType> dimensionTypeRegistration, boolean isClientSide, boolean isDebug,
-	                           long biomeZoomSeed, int maxChainedNeighborUpdates) {
-		super(levelData, dimension, registryAccess, dimensionTypeRegistration, isClientSide, isDebug, biomeZoomSeed, maxChainedNeighborUpdates);
-	}
-
-	@Inject(at = @At(value = "HEAD"), method = "getCloudColor(F)I",
-			cancellable = true)
-	public void colorfulskies_colorClouds(float partialTick, CallbackInfoReturnable<Integer> cir) {
+	@ModifyArg(
+			method = "renderLevel(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/minecraft/client/renderer/LevelRenderer;addCloudsPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/CloudStatus;Lnet/minecraft/world/phys/Vec3;JFIFLorg/joml/Matrix4f;)V"
+			), index = 5
+	)
+	private int colorfulskies_colorClouds(int cloudColor) {
 		Integer color = ClientHandler.getCloudColor();
 		if (color != null) {
-			cir.setReturnValue(color);
+			return ARGB.opaque(color);
 		}
-	}
-
-	@Inject(at = @At(value = "HEAD"), method = "getSkyColor(Lnet/minecraft/world/phys/Vec3;F)I",
-			cancellable = true)
-	public void colorfulskies_colorSky(Vec3 pPos, float partialTick, CallbackInfoReturnable<Integer> cir) {
-		Vec3 color = ClientHandler.getSkyColor();
-		if (color != null) {
-			float timeOffDay = this.getTimeOfDay(partialTick);
-			float rainLevel = this.getRainLevel(partialTick);
-			float thunderLevel = this.getThunderLevel(partialTick);
-			int flashTime = ((ClientLevel) (Object) this).getSkyFlashTime();
-			cir.setReturnValue(ClientHandler.generateSkyColor(color, timeOffDay, rainLevel, thunderLevel, flashTime, partialTick));
-		}
+		return cloudColor;
 	}
 }
