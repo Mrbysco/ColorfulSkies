@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.SkyRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.resources.model.AtlasManager;
+import net.minecraft.client.resources.model.sprite.AtlasManager;
 import org.joml.Vector4fc;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,7 +36,7 @@ public abstract class SkyRendererMixin {
 	private GpuBuffer colorfulskies$sunbuffer;
 
 	@Inject(
-			method = "<init>(Lnet/minecraft/client/renderer/texture/TextureManager;Lnet/minecraft/client/resources/model/AtlasManager;)V",
+			method = "<init>(Lnet/minecraft/client/renderer/texture/TextureManager;Lnet/minecraft/client/resources/model/sprite/AtlasManager;)V",
 			at = @At("TAIL"))
 	private void colorfulskies_changeSunTexture(TextureManager textureManager, AtlasManager atlasManager, CallbackInfo ci) {
 		if (colorfulskies$sunbuffer == null) {

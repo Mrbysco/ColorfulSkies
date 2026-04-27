@@ -10,19 +10,20 @@ import com.mrbysco.colorfulskies.network.message.SkyColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunColorPayload;
 import com.mrbysco.colorfulskies.network.message.SunriseColorPayload;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.SavedDataStorage;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class SkyColorData extends SavedData {
-	private static final String DATA_NAME = ColorfulSkies.MOD_ID + "_world_data";
+	private static final Identifier DATA_NAME = Identifier.fromNamespaceAndPath(ColorfulSkies.MOD_ID, "sky_color_data");
 
 	private static final Codec<Map<UUID, SkyColorInfo>> MAP_CODEC = Codec.unboundedMap(UUIDUtil.STRING_CODEC, SkyColorInfo.CODEC);
 	private static final Codec<SkyColorData> CODEC = RecordCodecBuilder.create(inst -> inst.group(
@@ -54,7 +55,7 @@ public class SkyColorData extends SavedData {
 		ServerLevel overworld = level.getServer().getLevel(Level.OVERWORLD);
 
 		assert overworld != null;
-		DimensionDataStorage storage = overworld.getDataStorage();
+		SavedDataStorage storage = overworld.getDataStorage();
 		return storage.computeIfAbsent(type());
 	}
 

@@ -1,11 +1,9 @@
 {
   "required": true,
   "minVersion": "0.8.5",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "package": "com.mrbysco.colorfulskies.mixin",
   "target": "@env(DEFAULT)",
-  "mixins": [
-  ],
   "client": [
     "ClientLevelDataMixin",
     "ClientLevelMixin",
